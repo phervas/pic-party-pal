@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, Send, X, ImageIcon } from "lucide-react";
+import { ArrowLeft, Send, X, ImageIcon, Camera } from "lucide-react";
 
 interface ChatMessage {
   id: number;
@@ -20,20 +19,13 @@ const Result = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState(buttonLabel);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [hasTriggered, setHasTriggered] = useState(false);
+  const [showCapturePrompt, setShowCapturePrompt] = useState(!!autoCapture);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-launch camera on arrival
-  useEffect(() => {
-    if (autoCapture && !hasTriggered) {
-      setHasTriggered(true);
-      // Small delay to let the page render first
-      const timer = setTimeout(() => {
-        fileInputRef.current?.click();
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [autoCapture, hasTriggered]);
+  const handleCapturePromptClick = () => {
+    setShowCapturePrompt(false);
+    fileInputRef.current?.click();
+  };
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -81,6 +73,20 @@ const Result = () => {
         </Button>
         <h1 className="text-lg font-semibold">Chat</h1>
       </header>
+
+      {/* Full-screen capture prompt overlay */}
+      {showCapturePrompt && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm cursor-pointer"
+          onClick={handleCapturePromptClick}
+        >
+          <div className="rounded-full bg-primary p-6 mb-6 shadow-lg">
+            <Camera className="h-12 w-12 text-primary-foreground" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Tap to capture</h2>
+          <p className="text-muted-foreground text-sm">Tap anywhere to open your camera</p>
+        </div>
+      )}
 
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
