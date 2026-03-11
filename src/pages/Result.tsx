@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, Send, X, ImageIcon } from "lucide-react";
+import { ArrowLeft, Send, X, ImageIcon, Camera } from "lucide-react";
 
 interface ChatMessage {
   id: number;
@@ -20,20 +19,13 @@ const Result = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState(buttonLabel);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [hasTriggered, setHasTriggered] = useState(false);
+  const [showCapturePrompt, setShowCapturePrompt] = useState(!!autoCapture);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-launch camera on arrival
-  useEffect(() => {
-    if (autoCapture && !hasTriggered) {
-      setHasTriggered(true);
-      // Small delay to let the page render first
-      const timer = setTimeout(() => {
-        fileInputRef.current?.click();
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [autoCapture, hasTriggered]);
+  const handleCapturePromptClick = () => {
+    setShowCapturePrompt(false);
+    fileInputRef.current?.click();
+  };
 
   // Scroll to bottom on new messages
   useEffect(() => {
